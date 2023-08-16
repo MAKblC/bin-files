@@ -110,14 +110,7 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   setI2Cmodule();
-  /* WiFi.mode(WIFI_STA);
-    WiFi.begin(AP_SSID, AP_PASS);
-    while (WiFi.status() != WL_CONNECTED) {
-     delay(500);
-     Serial.print(".");
-    }
-    Serial.println(WiFi.localIP());
-  */
+ 
   // подключаем конструктор и запускаем
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(local_IP, gateway, subnet);
