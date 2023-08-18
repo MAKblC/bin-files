@@ -6,6 +6,7 @@
   Created by Dmitry Baev
   //********************************************************************
 */
+bool TCA9548A;
 
 #include <GyverPortal.h>
 GyverPortal ui;
@@ -179,7 +180,8 @@ void setup() {
   Serial.begin(115200);
   delay(512);
   Wire.begin();
-
+  setI2Cmodule();
+  
   setBusChannel(0x04);
   mcp3221_5.setAlpha(DEFAULT_ALPHA);
   mcp3221_5.setNumSamples(DEFAULT_NUM_SAMPLES);
@@ -276,14 +278,86 @@ void loop() {
   }
 }
 
-//функция смены I2C-порта
-bool setBusChannel(uint8_t i2c_channel) {
-  if (i2c_channel >= MAX_CHANNEL) {
+//функция автоопределения микросхемы платы расширения
+int setI2Cmodule(void) {
+  int error;
+  /*Контроллер подключается к адресу платы расширения*/
+  Wire.beginTransmission(I2C_HUB_ADDR);
+  delay(100);
+  error = Wire.endTransmission(); //если плата расширения не найдена или не определена - контроллер выходит из функции определения с выведением ошибки.
+  if (error != 0)
+  {
+    Serial.print("\nNo I2C Module / Broken Module\n");
+    Serial.print("Error #");
+    Serial.print(error);
+    Serial.print("\n");
+    return error;
+  }
+  /*Контроллер переключает вывод платы расширения на GP17/GP16 по старому образцу*/
+  Wire.beginTransmission(I2C_HUB_ADDR);
+  delay(100);
+  Wire.write(EN_MASK | 0x07);
+  Wire.endTransmission();
+  Wire.beginTransmission(0x77); //опрос подключенного к выводу датчика MGS-THP80
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    Serial.print("\nOld Type Module");
+    TCA9548A = false;
+    return error;
+  }
+  /*Контроллер переключает вывод платы расширения на GP17/GP16 по новому образцу*/
+  Wire.beginTransmission(I2C_HUB_ADDR);
+  delay(100);
+  Wire.write(0x01 << 0x07);
+  Wire.endTransmission();
+  Wire.beginTransmission(0x77); //опрос подключенного к выводу датчика MGS-THP80
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    Serial.print("\nNew Type Module");
+    TCA9548A = true;
+    return error;
+  }
+  /*если плата расширения обнаружена, но не определился образец модели, выводится ошибка*/
+  Serial.print("\nError #");
+  Serial.print(error);
+  return error;
+
+  /*ERRORS:
+    0: success.
+
+    1: data too long to fit in transmit buffer.
+    2: received NACK on transmit of address.
+    3: received NACK on transmit of data.
+    4: other error.
+    5: timeout
+  */
+}
+
+/*переключение выводов платы расширения*/
+bool setBusChannel(uint8_t i2c_channel)
+{
+  if (i2c_channel >= MAX_CHANNEL)
+  {
     return false;
-  } else {
+  }
+  else
+  {
     Wire.beginTransmission(I2C_HUB_ADDR);
-    Wire.write(i2c_channel | EN_MASK);
+    /*определена плата расширения модели TI TCA9548A (нового образца)*/
+    if (TCA9548A == true) {
+      Serial.println("New TI TCA9548A module");
+      Wire.write(0x01 << i2c_channel);
+    }
+    /*в противном случае считается, что модель платы расширения - NXP PSA9547PW (старого образца)*/
+    else {
+      Serial.println("Old NXP PCA9547PW module");
+      Wire.write(i2c_channel | EN_MASK);
+    }
+
     Wire.endTransmission();
     return true;
   }
+
 }
