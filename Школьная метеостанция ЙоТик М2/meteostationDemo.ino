@@ -23,7 +23,6 @@ IPAddress subnet(255, 255, 0, 0);
 #define AP_PASS "Meteo1351"
 
 #include <BlynkSimpleEsp32.h>
-#include <Adafruit_ADS1015.h>
 #include <Wire.h>
 
 #include <BH1750.h>    // добавляем библиотеку датчика освещенности // adding Light intensity sensor library
