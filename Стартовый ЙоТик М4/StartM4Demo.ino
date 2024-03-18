@@ -299,7 +299,15 @@ int setI2Cmodule(void) {
   delay(100);
   Wire.write(EN_MASK | 0x05);
   Wire.endTransmission();
-  Wire.beginTransmission(0x29); //опрос подключенного к выводу датчика MGS-D20
+  Wire.beginTransmission(0x76); //опрос подключенного к выводу датчика MGS-THP80
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    Serial.print("\nOld Type Module");
+    TCA9548A = false;
+    return error;
+  }
+  Wire.beginTransmission(0x77); //опрос подключенного к выводу датчика MGS-THP80
   error = Wire.endTransmission();
   if (error == 0)
   {
@@ -312,7 +320,15 @@ int setI2Cmodule(void) {
   delay(100);
   Wire.write(0x01 << 0x05);
   Wire.endTransmission();
-  Wire.beginTransmission(0x29); //опрос подключенного к выводу датчика MGS-D20
+  Wire.beginTransmission(0x76); //опрос подключенного к выводу датчика MGS-THP80
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    Serial.print("\nNew Type Module");
+    TCA9548A = true;
+    return error;
+  }
+  Wire.beginTransmission(0x77); //опрос подключенного к выводу датчика MGS-THP80
   error = Wire.endTransmission();
   if (error == 0)
   {
