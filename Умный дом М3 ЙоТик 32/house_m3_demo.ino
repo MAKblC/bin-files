@@ -91,6 +91,7 @@ const byte picture[] PROGMEM = {  // картинка
 #include <ESP32_Servo.h>
 Servo window;
 Servo gates;
+// в файлах проекта показано, как настроить углы
 #define OPENED_GATES 70
 #define CLOSED_GATES 30
 #define OPENED_WINDOW 30
