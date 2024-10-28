@@ -18,10 +18,11 @@ VL53L0X lox2;
 */
 #include <MGB_I2C63.h>
 // false - для PW548A, true - для PCA9547
-MGB_I2C63 mgb_i2c63 = MGB_I2C63(false);
+MGB_I2C63 mgb_i2c63 = MGB_I2C63(true);
 #define GYRO 0x07
 #define DIST1 0x05
 #define DIST2 0x03
+#define BUZ 0x06
 
 #include <MGB_BUZ1.h>  // библиотека для MGB-BUZ1
 Adafruit_MCP4725 buzzer;
@@ -57,6 +58,7 @@ void build(gh::Builder& b) {
     b.Color(&colorRGB).label("RGB-светодиоды").size(2).attach(setColorRGB);
 
     if (b.Button().label("Генератор звука").click()) {
+      mgb_i2c63.setBusChannel(BUZ);
       buzzer.note(3, 450);
       buzzer.setVoltage(0, false);
     }
@@ -85,6 +87,7 @@ void setup() {
   }
 
   // запуск генератора звука
+  mgb_i2c63.setBusChannel(BUZ);
   buzzer.begin(0x60);           // Без перемычки адрес будет 0x61
   buzzer.setVoltage(0, false);  // выключение звука
   buzzer.volume(800);           // громкость (1-999)
