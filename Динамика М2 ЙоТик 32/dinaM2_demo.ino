@@ -138,17 +138,17 @@ void loop() {
   ///////////////////////////////////////////////
   /////////// с крестовины //////////////////////
   if (posi.y == -1) {
-    mdyn2.motor_setpower(1, power * 50 + kF, false);
-    mdyn2.motor_setpower(2, power * 50 - kF, true);
-  } else if (posi.y == 1) {
     mdyn2.motor_setpower(1, power * 50 + kF, true);
     mdyn2.motor_setpower(2, power * 50 - kF, false);
+  } else if (posi.y == 1) {
+    mdyn2.motor_setpower(1, power * 50 + kF, false);
+    mdyn2.motor_setpower(2, power * 50 - kF, true);
   } else if (posi.x == -1) {
-    mdyn2.motor_setpower(1, power * 50, true);
-    mdyn2.motor_setpower(2, power * 50, true);
-  } else if (posi.x == 1) {
     mdyn2.motor_setpower(1, power * 50, false);
     mdyn2.motor_setpower(2, power * 50, false);
+  } else if (posi.x == 1) {
+    mdyn2.motor_setpower(1, power * 50, true);
+    mdyn2.motor_setpower(2, power * 50, true);
   } else {
     mdyn2.motor_setpower(1, 0, false);
     mdyn2.motor_setpower(2, 0, false);
